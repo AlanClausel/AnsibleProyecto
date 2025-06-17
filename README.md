@@ -3,6 +3,8 @@
 
  https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-on-centos-7
 
+ Prerequisitos descagar vagrant --> https://developer.hashicorp.com/vagrant/install
+
  Este `README` proporciona instrucciones básicas para la instalación de herramientas necesarias y la configuración de una máquina virtual con Vagrant con las herramientas necesarias.
 
 ## Configuración de Vagrant :
@@ -38,5 +40,11 @@ En el directorio de tu proyecto, encontrarás una carpeta llamada "Vagrant". Est
    hostname -I
    ```
 4- Ingresar la ip del host en el buscador para ver el nginx y el php
-    nginx --> http://server_domain_name_or_IP/
-    PHP   --> http://server_host_or_IP/info.php
+    ```bash
+   nginx --> http://server_domain_name_or_IP/
+   ```
+   ```bash
+   PHP   --> http://server_host_or_IP/info.php
+   ```   
+    
+    
