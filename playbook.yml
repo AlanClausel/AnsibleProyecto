@@ -1,0 +1,113 @@
+---
+- hosts: localhost
+  become: true
+  vars_files:
+   - vars/default.yml
+
+  tasks:
+   - name: Install EPEL repository
+     dnf:
+       name: epel-release
+       state: present
+
+   - name: Install Python and MySQL connector prerequisites
+     dnf:
+       name: "{{ item }}"
+       state: latest
+     loop:
+       - python3
+       - python3-PyMySQL
+
+   - name: Install LEMP stack packages
+     dnf:
+       name: "{{ item }}"
+       state: latest
+     loop:
+       - nginx
+       - mariadb-server
+       - mariadb
+       - php-fpm
+       - php-mysqlnd
+       - php-json
+       - php-mbstring
+
+   - name: Start and enable services
+     service:
+       name: "{{ item }}"
+       state: started
+       enabled: yes
+     loop:
+       - nginx
+       - mariadb
+       - php-fpm
+ 
+# Nginx Configuration
+  
+   - name: Sets Nginx conf file
+     template:
+       src: "files/nginx.conf.j2"
+       dest: "/etc/nginx/conf.d/{{ http_conf }}"
+
+  #  - name: Enables new site
+  #    file:
+  #      src: "/etc/nginx/conf.d/{{ http_conf }}"
+  #      dest: "/etc/nginx/conf.d/{{ http_conf }}"
+  #      state: link
+  #    notify: Reload Nginx 
+  
+   - name: Removes "default" site
+     file:
+       path: "/etc/nginx/conf.d/default"
+       state: absent
+     notify: Reload Nginx
+
+# MySQL Configuration
+
+   - name: Sets the root password
+     mysql_user:
+       name: root
+       password: "{{ mysql_root_password }}"
+       login_unix_socket: /var/lib/mysql/mysql.sock
+
+   - name: Removes all anonymous user accounts
+     mysql_user:
+       name: ''
+       host_all: yes
+       state: absent
+       login_user: root
+       login_password: "{{ mysql_root_password }}"
+
+   - name: Removes the MySQL test database
+     mysql_db:
+       name: test
+       state: absent
+       login_user: root
+       login_password: "{{ mysql_root_password }}"
+
+# UFW Configuration
+
+  #  - name: "UFW - Allow HTTP on port {{ http_port }}"
+  #    ufw:
+  #      rule: allow
+  #      port: "{{ http_port }}"
+  #      proto: tcp
+
+# Sets Up PHP Info Page
+
+   - name: Sets Up PHP Info Page
+     template:
+       src: "files/info.php.j2"
+       dest: "/usr/share/nginx/html/info.php"
+
+# Handlers
+
+  handlers:
+   - name: Reload Nginx
+     service:
+       name: nginx
+       state: reloaded
+
+   - name: Restart Nginx
+     service:
+       name: nginx
+       state: restarted
