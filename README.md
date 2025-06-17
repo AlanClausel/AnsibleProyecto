@@ -40,7 +40,7 @@ En el directorio de tu proyecto, encontrarás una carpeta llamada "Vagrant". Est
    hostname -I
    ```
 4- **Ingresar IP** Ingresar la ip del host en el buscador para ver el nginx y el php
-    ```bash
+   ```bash
    nginx --> http://server_domain_name_or_IP/
    ```
    ```bash
